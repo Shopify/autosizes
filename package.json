@@ -1,0 +1,25 @@
+{
+  "name": "autosizes",
+  "version": "1.0.0",
+  "description": "A polyfill for the sizes=\"auto\" attribute on images",
+  "main": "autosizes.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:report": "playwright test --reporter=html",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit"
+  },
+  "keywords": [
+    "polyfill",
+    "responsive",
+    "images",
+    "sizes",
+    "auto",
+    "lazy-loading"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.42.1"
+  }
+} 

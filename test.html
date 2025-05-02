@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sizes="auto" Polyfill Test</title>
+    <script src="autosizes.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .test-case {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .test-case h3 {
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .image-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid transparent;
+        }
+        
+        .image-container.polyfilled img {
+            border-color: #4CAF50;
+        }
+        
+        .image-info {
+            margin-top: 10px;
+            font-size: 14px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .image-info code {
+            display: block;
+            margin: 5px 0;
+            font-family: monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .status {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status.polyfilled {
+            background-color: #4CAF50;
+        }
+        
+        .status.native {
+            background-color: #2196F3;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .feature-status {
+            padding: 10px 15px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .feature-status.supported {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        
+        .feature-status.polyfilled {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+        
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>sizes="auto" Polyfill Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Cases</h2>
+        <p>This page tests various configurations of images with sizes="auto" and loading="lazy".</p>
+        
+        <div class="test-grid">
+            <div class="test-case">
+                <h3>Basic Test</h3>
+                <div class="image-container" id="test1">
+                    <img 
+                        id="img-test1"
+                        loading="lazy" 
+                        sizes="auto"
+                        src="https://picsum.photos/800/600?random=1" 
+                        srcset="https://picsum.photos/400/300?random=1 400w,
+                                https://picsum.photos/800/600?random=1 800w,
+                                https://picsum.photos/1200/900?random=1 1200w"
+                        alt="Test image with sizes=auto">
+                    <div class="status">...</div>
+                </div>
+                <div class="image-info">
+                    <code>loading="lazy"</code>
+                    <code>sizes="auto"</code>
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>With Default Size</h3>
+                <div class="image-container" id="test2">
+                    <img 
+                        id="img-test2"
+                        loading="lazy" 
+                        sizes="auto, (min-width: 1000px) 800px, 100vw"
+                        src="https://picsum.photos/800/600?random=2" 
+                        srcset="https://picsum.photos/400/300?random=2 400w,
+                                https://picsum.photos/800/600?random=2 800w,
+                                https://picsum.photos/1200/900?random=2 1200w"
+                        alt="Test image with sizes=auto and fallback">
+                    <div class="status">...</div>
+                </div>
+                <div class="image-info">
+                    <code>loading="lazy"</code>
+                    <code>sizes="auto, (min-width: 1000px) 800px, 100vw"</code>
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>Without Lazy Loading</h3>
+                <div class="image-container" id="test3">
+                    <img 
+                        id="img-test3"
+                        sizes="auto"
+                        src="https://picsum.photos/800/600?random=3" 
+                        srcset="https://picsum.photos/400/300?random=3 400w,
+                                https://picsum.photos/800/600?random=3 800w,
+                                https://picsum.photos/1200/900?random=3 1200w"
+                        alt="Test image with sizes=auto but no lazy loading">
+                    <div class="status">...</div>
+                </div>
+                <div class="image-info">
+                    <code>sizes="auto"</code>
+                    <code>No loading="lazy"</code>
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>Regular Lazy Loading</h3>
+                <div class="image-container" id="test4">
+                    <img 
+                        id="img-test4"
+                        loading="lazy" 
+                        sizes="100vw"
+                        src="https://picsum.photos/800/600?random=4" 
+                        srcset="https://picsum.photos/400/300?random=4 400w,
+                                https://picsum.photos/800/600?random=4 800w,
+                                https://picsum.photos/1200/900?random=4 1200w"
+                        alt="Test image with lazy loading but no auto sizes">
+                    <div class="status">...</div>
+                </div>
+                <div class="image-info">
+                    <code>loading="lazy"</code>
+                    <code>sizes="100vw"</code>
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>Resizable Test</h3>
+                <div class="image-container" id="test5" style="width: 200px; resize: horizontal; overflow: auto;">
+                    <img 
+                        id="img-test5"
+                        loading="lazy" 
+                        sizes="auto"
+                        src="https://picsum.photos/800/600?random=5" 
+                        srcset="https://picsum.photos/400/300?random=5 400w,
+                                https://picsum.photos/800/600?random=5 800w,
+                                https://picsum.photos/1200/900?random=5 1200w"
+                        alt="Resizable test image">
+                    <div class="status">...</div>
+                </div>
+                <div class="image-info">
+                    <code>loading="lazy"</code>
+                    <code>sizes="auto"</code>
+                    <code>Resizable container</code>
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>Post-FCP Image</h3>
+                <div class="image-container" id="test6" style="width: 300px; height: 200px;">
+                </div>
+                <div class="image-info">
+                    <code>loading="lazy"</code>
+                    <code>sizes="auto"</code>
+                    <code>Added after FCP</code>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add this function to handle the post-FCP image addition
+        function addPostFCPImage() {
+            const container = document.getElementById('test6');
+            const img = document.createElement('img');
+            img.id = 'img-test6';
+            img.loading = 'lazy';
+            img.sizes = 'auto';
+            img.src = 'https://picsum.photos/800/600?random=6';
+            img.srcset = 'https://picsum.photos/400/300?random=6 400w, ' +
+                         'https://picsum.photos/800/600?random=6 800w, ' +
+                         'https://picsum.photos/1200/900?random=6 1200w';
+            img.alt = 'Image added after FCP';
+            container.insertBefore(img, container.firstChild);
+        }
+        // Add a performance observer to detect when the FCP is reached
+        const observer = new PerformanceObserver((entries) => {
+            entries.getEntriesByName('first-contentful-paint').forEach(() => {
+                addPostFCPImage();
+            });
+        });
+        observer.observe({ type: 'paint', buffered: true });
+    </script>
+</body>
+</html>
