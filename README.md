@@ -41,6 +41,10 @@ npx playwright install firefox webkit
 npx playwright test
 ```
 
+## Minification
+
+`npm run minify`
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
