@@ -47,8 +47,8 @@ npx playwright test
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## License
 
-MIT 
+See [LICENSE.md](./LICENSE.md)
