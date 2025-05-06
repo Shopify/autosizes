@@ -4,7 +4,7 @@
   // support without a forced layout, which would make things slower for everyone.
   const polyfillAutoSizes = () => {
     // Avoid polyfilling if the browser is too old and doesn't support performance observer and paint timing
-    if (!('PerformanceObserver' in window) || !('paint' in PerformanceObserver.supportedEntryTypes)) {
+    if (!('PerformanceObserver' in window) || !(PerformanceObserver.supportedEntryTypes.includes('paint'))) {
       return false;
     }
 
@@ -19,7 +19,7 @@
     return chromeVersion < 126;
   };
 
-  if (polyfillAutoSizes()) {
+  if (!polyfillAutoSizes()) {
     return;
   }
 
