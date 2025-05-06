@@ -23,13 +23,14 @@
     return;
   }
 
+  const attributes = ['src', 'srcset'];
+  const prefix = 'data-auto-sizes-';
   let didFirstContentfulPaintRun = false;
   function calculateAndSetSizes(img) {
     // Calculate the displayed width of the image
     // getBoundingClientRect() forces layout, but this is running right after FCP,
     // so hopefully the DOM is not dirty.
     const computedWidth = Math.round(img.getBoundingClientRect().width);
-    console.log(`computedWidth for ${img.src}: ${computedWidth}`);
     
     // Set the sizes attribute to the computed width in pixels
     if (computedWidth > 0) {
@@ -56,15 +57,13 @@
         continue;
       }
       if (!didFirstContentfulPaintRun) {
-        // Remove src and srcset to prevent loading
-        if (img.hasAttribute('src')) {
-          img.setAttribute('data-auto-sizes-src', img.getAttribute('src'));
-          img.removeAttribute('src');
-        }
-        
-        if (img.hasAttribute('srcset')) {
-          img.setAttribute('data-auto-sizes-srcset', img.getAttribute('srcset'));
-          img.removeAttribute('srcset');
+        for (const attribute of attributes) {
+          if (img.hasAttribute(attribute)) {
+            // Store original src and srcset
+            img.setAttribute(`${prefix}${attribute}`, img.getAttribute(attribute));
+            // Remove src and srcset to prevent loading
+            img.removeAttribute(attribute);
+          }
         }
       } else {
         // Calculate sizes without removing src and srcset
@@ -75,22 +74,16 @@
 
   // Set the sizes attribute to the computed width in pixels and restore original src and srcset
   function restoreImageAttributes() {
-    const images = document.querySelectorAll('img[sizes^="auto"][loading="lazy"]');
+    const images = document.querySelectorAll(`img[${prefix}src], img[${prefix}srcset]`);
     
     for (const img of images) {
-      if (img.hasAttribute('data-auto-sizes-src') || 
-          img.hasAttribute('data-auto-sizes-srcset')) {
-        
-        calculateAndSetSizes(img);
-        // Restore original src and srcset
-        if (img.hasAttribute('data-auto-sizes-src')) {
-          img.src = img.getAttribute('data-auto-sizes-src');
-          img.removeAttribute('data-auto-sizes-src');
-        }
-        
-        if (img.hasAttribute('data-auto-sizes-srcset')) {
-          img.srcset = img.getAttribute('data-auto-sizes-srcset');
-          img.removeAttribute('data-auto-sizes-srcset');
+      calculateAndSetSizes(img);
+
+      for (const attribute of attributes) {
+        const tempAttribute = `${prefix}${attribute}`;
+        if (img.hasAttribute(tempAttribute)) {
+          img[attribute] = img.getAttribute(tempAttribute);
+          img.removeAttribute(tempAttribute);
         }
       }
     }
