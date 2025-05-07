@@ -38,7 +38,7 @@
     } else {
       // If we get a negative or zero width, use the parent's width
       // or fall back to 100vw if that's not available
-      const parentWidth = Math.round(img.parentElement?.getBoundingClientRect().width ?? 0);
+      const parentWidth = img.parentElement ? Math.round(img.parentElement.getBoundingClientRect().width) : 0;
       img.sizes = parentWidth > 0 ? `${parentWidth}px` : '100vw';
     }
   }
@@ -52,7 +52,7 @@
         continue;
       }
       // Only process images with sizes attribute starting with "auto" and loading="lazy"
-      if (!img.getAttribute('sizes')?.trim().startsWith('auto') || 
+      if (!(img.getAttribute('sizes') || '').trim().startsWith('auto') || 
           img.getAttribute('loading') !== 'lazy') {
         continue;
       }
