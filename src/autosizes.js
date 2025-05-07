@@ -148,6 +148,7 @@
     attributeFilter: ['sizes', 'loading'],
   });
 
+  // Prevent the load of any existing images when the polyfill loads.
   preventNonAutoImageLoad(
     document.querySelectorAll('img[sizes^="auto"][loading="lazy"]'),
   );
