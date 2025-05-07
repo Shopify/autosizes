@@ -6,7 +6,7 @@ test.describe('autosizes polyfill', () => {
   for (const testFile of testFiles) {
     test.describe(`testing ${testFile}`, () => {
       test.beforeEach(async ({ page }) => {
-        await page.goto(`http://localhost:8000/${testFile}`);
+        await page.goto(`http://localhost:8000/test/${testFile}`);
       });
 
       test('should handle basic test case', async ({ page, browserName }) => {
