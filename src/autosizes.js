@@ -1,20 +1,23 @@
-(function() {
+(function () {
   // Check if the browser already supports sizes="auto"
   // We're using UA sniffing here, as there's no way to detect browser
   // support without a forced layout, which would make things slower for everyone.
   const polyfillAutoSizes = () => {
     // Avoid polyfilling if the browser is too old and doesn't support performance observer and paint timing
-    if (!('PerformanceObserver' in window) || !(PerformanceObserver.supportedEntryTypes.includes('paint'))) {
+    if (
+      !('PerformanceObserver' in window) ||
+      !PerformanceObserver.supportedEntryTypes.includes('paint')
+    ) {
       return false;
     }
 
     const userAgent = navigator.userAgent;
     const chromeMatch = userAgent.match(/Chrome\/(\d+)/);
-    
+
     if (!chromeMatch) {
       return true;
     }
-    
+
     const chromeVersion = parseInt(chromeMatch[1], 10);
     return chromeVersion < 126;
   };
@@ -31,14 +34,16 @@
     // getBoundingClientRect() forces layout, but this is running right after FCP,
     // so hopefully the DOM is not dirty.
     const computedWidth = Math.round(img.getBoundingClientRect().width);
-    
+
     // Set the sizes attribute to the computed width in pixels
     if (computedWidth > 0) {
       img.sizes = `${computedWidth}px`;
     } else {
       // If we get a negative or zero width, use the parent's width
       // or fall back to 100vw if that's not available
-      const parentWidth = img.parentElement ? Math.round(img.parentElement.getBoundingClientRect().width) : 0;
+      const parentWidth = img.parentElement
+        ? Math.round(img.parentElement.getBoundingClientRect().width)
+        : 0;
       img.sizes = parentWidth > 0 ? `${parentWidth}px` : '100vw';
     }
   }
@@ -52,15 +57,20 @@
         continue;
       }
       // Only process images with sizes attribute starting with "auto" and loading="lazy"
-      if (!(img.getAttribute('sizes') || '').trim().startsWith('auto') || 
-          img.getAttribute('loading') !== 'lazy') {
+      if (
+        !(img.getAttribute('sizes') || '').trim().startsWith('auto') ||
+        img.getAttribute('loading') !== 'lazy'
+      ) {
         continue;
       }
       if (!didFirstContentfulPaintRun) {
         for (const attribute of attributes) {
           if (img.hasAttribute(attribute)) {
             // Store original src and srcset
-            img.setAttribute(`${prefix}${attribute}`, img.getAttribute(attribute));
+            img.setAttribute(
+              `${prefix}${attribute}`,
+              img.getAttribute(attribute),
+            );
             // Remove src and srcset to prevent loading
             img.removeAttribute(attribute);
           }
@@ -74,8 +84,10 @@
 
   // Set the sizes attribute to the computed width in pixels and restore original src and srcset
   function restoreImageAttributes() {
-    const images = document.querySelectorAll(`img[${prefix}src], img[${prefix}srcset]`);
-    
+    const images = document.querySelectorAll(
+      `img[${prefix}src], img[${prefix}srcset]`,
+    );
+
     for (const img of images) {
       calculateAndSetSizes(img);
 
@@ -90,9 +102,9 @@
   }
 
   // Set up mutation observer to detect new images
-  const observer = new MutationObserver(mutations => {
+  const observer = new MutationObserver((mutations) => {
     const newImages = [];
-    
+
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
         for (const node of mutation.addedNodes) {
@@ -106,16 +118,18 @@
         }
       }
       // Check for attribute changes on images
-      else if (mutation.type === 'attributes' && 
-               mutation.target.nodeName === 'IMG' &&
-               (mutation.attributeName === 'sizes' ||
-                mutation.attributeName === 'loading' ||
-                mutation.attributeName === 'src' ||
-                mutation.attributeName === 'srcset')) {
+      else if (
+        mutation.type === 'attributes' &&
+        mutation.target.nodeName === 'IMG' &&
+        (mutation.attributeName === 'sizes' ||
+          mutation.attributeName === 'loading' ||
+          mutation.attributeName === 'src' ||
+          mutation.attributeName === 'srcset')
+      ) {
         newImages.push(mutation.target);
       }
     }
-    
+
     if (newImages.length > 0) {
       preventNonAutoImageLoad(newImages);
     }
@@ -126,16 +140,18 @@
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['sizes', 'loading']
+    attributeFilter: ['sizes', 'loading'],
   });
 
-  preventNonAutoImageLoad(document.querySelectorAll('img[sizes^="auto"][loading="lazy"]'));
+  preventNonAutoImageLoad(
+    document.querySelectorAll('img[sizes^="auto"][loading="lazy"]'),
+  );
 
-  (new PerformanceObserver((entries, observer) => {
+  new PerformanceObserver((entries, observer) => {
     entries.getEntriesByName('first-contentful-paint').forEach(() => {
       didFirstContentfulPaintRun = true;
       setTimeout(restoreImageAttributes, 0);
       observer.disconnect();
     });
-  })).observe({ type: 'paint', buffered: true });
+  }).observe({type: 'paint', buffered: true});
 })();
