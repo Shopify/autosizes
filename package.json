@@ -22,6 +22,8 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.42.1",
+    "@shopify/prettier-config": "^1.1.4",
     "terser": "^5.39.0"
-  }
+  },
+  "prettier": "@shopify/prettier-config"
 }
