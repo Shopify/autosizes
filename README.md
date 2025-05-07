@@ -1,10 +1,18 @@
-# sizes="auto" Polyfill
+# Autosizes - a `sizes="auto"` Polyfill
 
-A polyfill for the `sizes="auto"` attribute on images, which automatically calculates the appropriate image size based on the image's display width.
+This is a polyfill for the `sizes="auto"` attribute on images, which automatically calculates the appropriate image size based on the image's display width.
 
-## What it does
+## What's `sizes=auto`?
 
-This polyfill enables the `sizes="auto"` attribute for images in browsers that don't natively support it (currently only Chromium 126+ supports it natively). When used with `loading="lazy"`, it:
+The [image element's `sizes` attribute](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/sizes) accepts an `auto` value.
+When that value is combined with a `loading=lazy` attribute, which means that the browser waits for layout before loading the image, the browser automatically calculates the `sizes` attribute value, and fetches the right `srcset` variant.
+
+However, currently `sizes=auto` is only supported in Chromium browsers (above M126). This polyfill backports that support to older browsers.
+
+## What does the polyfill do?
+
+This polyfill enables the `sizes="auto"` attribute for images in browsers that don't natively support it (currently only Chromium 126+ supports it natively). 
+When the attribute is used with `loading="lazy"`, the polyfill:
 
 1. Prevents images from loading until layout kicks in
 2. Calculates the image's display width
