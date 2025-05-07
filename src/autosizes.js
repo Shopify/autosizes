@@ -38,7 +38,7 @@
     } else {
       // If we get a negative or zero width, use the parent's width
       // or fall back to 100vw if that's not available
-      const parentWidth = img.parentElement?.getBoundingClientRect().width;
+      const parentWidth = Math.round(img.parentElement?.getBoundingClientRect().width ?? 0);
       img.sizes = parentWidth > 0 ? `${parentWidth}px` : '100vw';
     }
   }
