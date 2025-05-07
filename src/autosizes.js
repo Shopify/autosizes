@@ -29,22 +29,27 @@
   const attributes = ['src', 'srcset'];
   const prefix = 'data-auto-sizes-';
   let didFirstContentfulPaintRun = false;
+  function getSizesValueFromElement(elem) {
+    const width = elem
+      ? Math.round(elem.getBoundingClientRect().width)
+      : 0;
+    if (width <= 0) {
+      return null;
+    }
+    // Set the sizes attribute to the computed width in pixels
+    return `${width}px`;
+  }
   function calculateAndSetSizes(img) {
     // Calculate the displayed width of the image
     // getBoundingClientRect() forces layout, but this is running right after FCP,
     // so hopefully the DOM is not dirty.
-    const computedWidth = Math.round(img.getBoundingClientRect().width);
-
-    // Set the sizes attribute to the computed width in pixels
-    if (computedWidth > 0) {
-      img.sizes = `${computedWidth}px`;
-    } else {
-      // If we get a negative or zero width, use the parent's width
-      // or fall back to 100vw if that's not available
-      const parentWidth = img.parentElement
-        ? Math.round(img.parentElement.getBoundingClientRect().width)
-        : 0;
-      img.sizes = parentWidth > 0 ? `${parentWidth}px` : '100vw';
+    let sizes = getSizesValueFromElement(img);
+    if (!sizes) {
+      // If we get no width for the image, use the parent's width
+      sizes = getSizesValueFromElement(img.parentElement);
+    }
+    if (sizes) {
+      img.sizes = sizes;
     }
   }
 
