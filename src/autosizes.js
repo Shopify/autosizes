@@ -26,20 +26,29 @@
   const attributes = ['src', 'srcset'];
   const prefix = 'data-auto-sizes-';
   let didFirstContentfulPaintRun = false;
+  function getSizesValueFromElement(elem) {
+    if (!elem) {
+      return null;
+    }
+    let width = elem.getBoundingClientRect().width;
+    if (width <= 0) {
+      return null;
+    }
+    width = Math.round(width);
+    // Set the sizes attribute to the computed width in pixels
+    return `${width}px`;
+  }
   function calculateAndSetSizes(img) {
     // Calculate the displayed width of the image
     // getBoundingClientRect() forces layout, but this is running right after FCP,
     // so hopefully the DOM is not dirty.
-    const computedWidth = Math.round(img.getBoundingClientRect().width);
-    
-    // Set the sizes attribute to the computed width in pixels
-    if (computedWidth > 0) {
-      img.sizes = `${computedWidth}px`;
-    } else {
-      // If we get a negative or zero width, use the parent's width
-      // or fall back to 100vw if that's not available
-      const parentWidth = Math.round(img.parentElement?.getBoundingClientRect().width ?? 0);
-      img.sizes = parentWidth > 0 ? `${parentWidth}px` : '100vw';
+    let sizes = getSizesValueFromElement(img);
+    if (!sizes) {
+      // If we get no width for the image, use the parent's width
+      sizes = getSizesValueFromElement(img.parentElement);
+    }
+    if (sizes) {
+      img.sizes = sizes;
     }
   }
 
@@ -52,7 +61,8 @@
         continue;
       }
       // Only process images with sizes attribute starting with "auto" and loading="lazy"
-      if (!img.getAttribute('sizes')?.trim().startsWith('auto') || 
+      const sizes = img.getAttribute('sizes');
+      if ((sizes && !sizes.trim().startsWith('auto')) || 
           img.getAttribute('loading') !== 'lazy') {
         continue;
       }
