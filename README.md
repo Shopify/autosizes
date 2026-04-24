@@ -7,11 +7,11 @@ This is a polyfill for the `sizes="auto"` attribute on images, which automatical
 The [image element's `sizes` attribute](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/sizes) accepts an `auto` value.
 When that value is combined with a `loading=lazy` attribute, which means that the browser waits for layout before loading the image, the browser automatically calculates the `sizes` attribute value, and fetches the right `srcset` variant.
 
-However, currently `sizes=auto` is only supported in Chromium browsers (above M126). This polyfill backports that support to older browsers.
+However, currently `sizes=auto` is only supported in Chromium browsers (above M126) and Firefox (above 150). This polyfill backports that support to older browsers.
 
 ## What does the polyfill do?
 
-This polyfill enables the `sizes="auto"` attribute for images in browsers that don't natively support it (currently only Chromium 126+ supports it natively). 
+This polyfill enables the `sizes="auto"` attribute for images in browsers that don't natively support it.
 When the attribute is used with `loading="lazy"`, the polyfill:
 
 1. Prevents images from loading until layout kicks in
@@ -32,7 +32,6 @@ Once First-Contentful-Paint is fired, which we use as a proxy to indicate that l
 Images that are changed or added after FCP fires get their `sizes` attribute rewritten without removing their `src` and `srcset`.
 
 The polyfill backs off if the browser is too old to support FCP, or if it supports `sizes=auto` natively.
-Unfortunately, the latter information is only available through User-Agent sniffing.
 
 ## Testing
 

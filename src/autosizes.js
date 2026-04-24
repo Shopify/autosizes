@@ -1,7 +1,5 @@
 (function () {
   // Check if the browser already supports sizes="auto"
-  // We're using UA sniffing here, as there's no way to detect browser
-  // support without a forced layout, which would make things slower for everyone.
   const polyfillAutoSizes = () => {
     // Avoid polyfilling if the browser is too old and doesn't support performance observer and paint timing
     if (
@@ -11,15 +9,15 @@
       return false;
     }
 
-    const userAgent = navigator.userAgent;
-    const chromeMatch = userAgent.match(/Chrome\/(\d+)/);
-
-    if (!chromeMatch) {
-      return true;
-    }
-
-    const chromeVersion = parseInt(chromeMatch[1], 10);
-    return chromeVersion < 126;
+    // Check UA styles for expected styles to support sizes auto.
+    const img = document.createElement('img');
+    img.style.setProperty('display', 'none', 'important');
+    img.style.setProperty('contain', 'revert', 'important');
+    img.sizes = 'auto';
+    document.documentElement.append(img);
+    const {contain} = getComputedStyle(img);
+    img.remove();
+    return contain !== 'size';
   };
 
   if (!polyfillAutoSizes()) {
