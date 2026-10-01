@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sizes="auto" Polyfill Injected Attributes Test</title>
+    <script src="../src/autosizes.js"></script>
+    <style>
+        img {
+            display: block;
+            width: 200px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- The images come before any text, so that they're all in the DOM before First-Contentful-Paint. -->
+    <!-- A legitimate image, which the polyfill defers and then restores. -->
+    <img
+        id="img-legitimate"
+        loading="lazy"
+        sizes="auto"
+        src="legitimate.png"
+        srcset="legitimate-400.png 400w, legitimate-800.png 800w"
+        alt="">
+    <!-- Markup that a sanitizer may let through, as it strips src and srcset but keeps data-* attributes. -->
+    <img
+        id="img-injected"
+        data-auto-sizes-src="injected.png"
+        data-auto-sizes-srcset="injected-400.png 400w"
+        alt="">
+    <img
+        id="img-injected-lazy"
+        loading="lazy"
+        sizes="auto"
+        data-auto-sizes-src="injected-lazy.png"
+        data-auto-sizes-srcset="injected-lazy-400.png 400w"
+        alt="">
+    <!-- An injected data-* attribute next to a legitimate srcset that the polyfill defers. -->
+    <img
+        id="img-injected-mixed"
+        loading="lazy"
+        sizes="auto"
+        srcset="legitimate-mixed-400.png 400w"
+        data-auto-sizes-src="injected-mixed.png"
+        alt="">
+    <p>Images with data-auto-sizes-* attributes that weren't set by the polyfill must not be loaded.</p>
+</body>
+</html>

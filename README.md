@@ -24,6 +24,7 @@ When the attribute is used with `loading="lazy"`, the polyfill:
 The polyfill uses mutation observers to detect newly added HTMLImageElement elements with `loading=lazy` and `sizes=auto` attributes.
 
 It then removes any `src` and `srcset` attributes from those images, ensuring that they won't start loading images.
+Their original values are kept in memory rather than in the DOM, so the polyfill only ever restores values that it removed itself.
 
 Once First-Contentful-Paint is fired, which we use as a proxy to indicate that layout was calculated:
 * `sizes` attribute value gets overridden by the image's `getBoundingClientRect` pixel size.
