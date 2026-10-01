@@ -27,7 +27,12 @@
   }
 
   const attributes = ['src', 'srcset'];
-  const prefix = 'data-auto-sizes-';
+  // The original src and srcset values of images whose loading we deferred, keyed by element.
+  // These are kept in memory rather than in the DOM (e.g. in data-* attributes), so that only
+  // values the polyfill itself removed can ever be restored. Otherwise, page content carrying
+  // such attributes (e.g. sanitized user HTML that strips src but keeps data-* attributes)
+  // could get the polyfill to load arbitrary URLs.
+  const deferredImages = new Map();
   let didFirstContentfulPaintRun = false;
   function getSizesValueFromElement(elem) {
     const width = elem
@@ -69,17 +74,18 @@
         continue;
       }
       if (!didFirstContentfulPaintRun) {
+        // Merge with any values stored by a previous pass over this image
+        const originalAttributes =
+          deferredImages.get(img) || Object.create(null);
         for (const attribute of attributes) {
           if (img.hasAttribute(attribute)) {
             // Store original src and srcset
-            img.setAttribute(
-              `${prefix}${attribute}`,
-              img.getAttribute(attribute),
-            );
+            originalAttributes[attribute] = img.getAttribute(attribute);
             // Remove src and srcset to prevent loading
             img.removeAttribute(attribute);
           }
         }
+        deferredImages.set(img, originalAttributes);
       } else {
         // Calculate sizes without removing src and srcset
         calculateAndSetSizes(img);
@@ -89,21 +95,16 @@
 
   // Set the sizes attribute to the computed width in pixels and restore original src and srcset
   function restoreImageAttributes() {
-    const images = document.querySelectorAll(
-      `img[${prefix}src], img[${prefix}srcset]`,
-    );
-
-    for (const img of images) {
+    for (const [img, originalAttributes] of deferredImages) {
       calculateAndSetSizes(img);
 
       for (const attribute of attributes) {
-        const tempAttribute = `${prefix}${attribute}`;
-        if (img.hasAttribute(tempAttribute)) {
-          img[attribute] = img.getAttribute(tempAttribute);
-          img.removeAttribute(tempAttribute);
+        if (attribute in originalAttributes) {
+          img[attribute] = originalAttributes[attribute];
         }
       }
     }
+    deferredImages.clear();
   }
 
   // Set up mutation observer to detect new images

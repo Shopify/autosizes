@@ -46,4 +46,34 @@ test.describe('autosizes polyfill', () => {
       });
     });
   }
+
+  test.describe('testing test_injection.html', () => {
+    test('should not load URLs from data-auto-sizes-* attributes it did not set', async ({ page }) => {
+      const injectedRequests = [];
+      page.on('request', (request) => {
+        if (request.url().includes('/test/injected')) {
+          injectedRequests.push(request.url());
+        }
+      });
+      await page.goto('http://localhost:8000/test/test_injection.html');
+
+      // Wait for the polyfill to restore the legitimate image after FCP
+      const legitimate = page.locator('#img-legitimate');
+      await expect(legitimate).toHaveAttribute('sizes', '200px');
+      await expect(legitimate).toHaveAttribute('src', 'legitimate.png');
+      await expect(legitimate).toHaveAttribute('srcset', 'legitimate-400.png 400w, legitimate-800.png 800w');
+
+      for (const id of ['#img-injected', '#img-injected-lazy']) {
+        const img = page.locator(id);
+        expect(await img.getAttribute('src')).toBeNull();
+        expect(await img.getAttribute('srcset')).toBeNull();
+      }
+      const mixed = page.locator('#img-injected-mixed');
+      expect(await mixed.getAttribute('src')).toBeNull();
+      expect(await mixed.getAttribute('srcset')).toBe('legitimate-mixed-400.png 400w');
+
+      await page.waitForLoadState('networkidle');
+      expect(injectedRequests).toEqual([]);
+    });
+  });
 });
